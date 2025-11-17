@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>madeforhim - Level Up Your Vibe</title>
+    <script src="https://cdn.tailwindcss.com/3.3.3"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🖤</text></svg>">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .logo-font {
+            font-family: 'Playfair Display', serif;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        .slide-in-left {
+            transform: translateX(0);
+        }
+
+        .slide-out-left {
+            transform: translateX(-100%);
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fadeInDown {
+            animation: fadeInDown .6s cubic-bezier(.25, .46, .45, .94) forwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .animate-fadeIn {
+            animation: fadeIn .8s cubic-bezier(.25, .46, .45, .94) forwards;
+        }
+
+        @keyframes scaleIn {
+            from {
+                transform: scale(.95);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .animate-scaleIn {
+            animation: scaleIn .5s cubic-bezier(.25, .46, .45, .94) forwards;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-slideUp {
+            animation: slideUp .8s cubic-bezier(.25, .46, .45, .94) forwards;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fadeInUp {
+            animation: fadeInUp .8s cubic-bezier(.25, .46, .45, .94) forwards;
+        }
+
+        @keyframes pop {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.2);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .animate-pop {
+            animation: pop .3s cubic-bezier(.25, .46, .45, .94);
+        }
+
+        .grow-on-hover {
+            transition: transform .3s, box-shadow .3s;
+        }
+
+        .grow-on-hover:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, .1);
+        }
+
+        .product-card { 
+            cursor: pointer;
+            overflow: hidden;
+        }
+
+        .img-container {
+            position: relative;
+            padding-top: 125%;
+            /* 4:5 aspect ratio */
+            overflow: hidden;
+        }
+
+        .product-image {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: opacity .08s linear;
+        }
+
+        .category-card {
+            overflow: hidden;
+            transition: transform .3s, box-shadow .3s;
+        }
+
+        .category-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, .1);
+        }
+
+        .modal {
+            transition: opacity .3s, visibility .3s;
+            background: rgba(0, 0, 0, .5);
+        }
+
+        .modal-content {
+            transform: translateY(20px);
+            transition: transform .3s;
+        }
+
+        .modal.is-active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal.is-active .modal-content {
+            transform: translateY(0);
+        }
+
+        #hero-section {
+            background-color: #000;
+            transition: height 0.5s ease-out; /* Added transition for smooth slide-up */
+        }
+
+        /* New class to hide and slide up the hero section */
+        #hero-section.hidden-hero {
+            height: 0 !important;
+            overflow: hidden;
+        }
+
+        #hero-section .hero-panel {
+            background-image: url('https://images.unsplash.com/photo-1594953932264-77d0a298811e?q=80&w=1500&auto=format&fit=crop');
+        }
+
+        .hero-panel {
+            background-size: cover;
+            background-position: center;
+        }
+
+        .hero-image {
+            transition: filter 1s ease-out;
+        }
+
+        .hero-image.color {
+            filter: grayscale(0%);
+        }
+
+        @keyframes slideFromSide {
+            from {
+                transform: translate(100vw, -50%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translate(-50%, -50%);
+                opacity: 1;
+            }
+        }
+
+        #hero-logo {
+            font-size: 10vw;
+            line-height: 1;
+            color: rgb(26, 16, 16);
+            opacity: 0;
+            mix-blend-mode: overlay;
+            animation: slideFromSide 1.5s ease-out forwards;
+        }
+
+        #intro-logo {
+            animation: fadeIn 1.5s ease-out forwards;
+        }
+
+        .truncate-ellipsis {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        @keyframes slide-up-fade-in {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .slide-up-fade-in {
+            animation: slide-up-fade-in .5s ease-out forwards;
+        }
+
+        /* New styles for responsive categories */
+        .category-card .img-container {
+            position: relative;
+            width: 100%;
+            padding-top: 150%;
+            /* 2:3 aspect ratio for portrait images */
+            overflow: hidden;
+        }
+
+        .category-card img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+    </style>
+</head>
+
+<body class="bg-white text-gray-900">
+
+    <div id="full-screen-logo"
+        class="fixed inset-0 bg-white flex items-center justify-center z-[100] transition-opacity duration-700">
+        <h1 id="intro-logo" class="logo-font text-6xl md:text-8xl font-extrabold tracking-tighter text-gray-900">MADE
+            FOR HIM</h1>
+    </div>
+
+    <section id="hero-section" class="relative w-full h-screen overflow-hidden">
+        <div id="hero-panel" class="hero-panel hero-image w-full h-full bg-cover bg-center"
+            style="background-image:url('sami-sadeghi-K-y8kR7oD5A-unsplash.jpg');">
+        </div>
+        <h1 id="hero-logo"
+            class="logo-font absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 font-extrabold text-white text-6xl md:text-8xl lg:text-9xl text-center">
+            MADE FOR HIM</h1>
+    </section>
+
+    <header
+        class="fixed top-0 left-0 w-full z-50 py-4 px-6 md:flex md:items-center md:justify-center text-gray-900 bg-white">
+        <div class="flex items-center justify-between w-full md:w-auto">
+            <div class="md:hidden flex items-center">
+                <button id="mobile-menu-toggle" class="mr-4">☰</button>
+            </div>
+
+            <a href="#" id="home-link"
+                class="logo-font text-xl md:text-2xl font-bold md:absolute md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2"
+                data-page="home">
+                <img src="/MAID .png" alt="MADE FOR HIM Logo" class="w-12 h-auto">
+            </a>
+
+            <div class="flex items-center space-x-4 md:absolute md:right-6 md:top-1/2 md:-translate-y-1/2">
+                <a href="#" id="wishlist-link" class="relative" data-page="wishlist" title="Wishlist">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path
+                            d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 1.24-3.72 2.76L12 7.5l-1.72-2.74C9.5 4.24 8.26 3 6.5 3A5.5 5.5 0 0 0 1 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
+                    </svg>
+                    <span id="wishlist-count"
+                        class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-4 h-4 text-[10px] flex items-center justify-center">0</span>
+                </a>
+
+                <a href="#" id="bag-link" class="relative" data-page="bag" title="Bag">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+                        <path d="M3 6h18" />
+                        <path d="M16 10a4 4 0 0 1-8 0" />
+                    </svg>
+                    <span id="bag-count"
+                        class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-4 h-4 text-[10px] flex items-center justify-center">0</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <div id="mobile-menu" class="fixed top-0 left-0 h-full w-full bg-white z-60 transform -translate-x-full md:hidden">
+        <div class="p-6 border-b">
+            <div class="flex justify-between items-center">
+                <h2 class="text-2xl font-bold logo-font">MADE FOR HIM</h2>
+                <button id="mobile-menu-close" class="text-gray-600">✕</button>
+            </div>
+        </div>
+        <nav class="p-6 space-y-4">
+            <a href="#" class="block" data-page="home">HOME</a>
+            <a href="#" class="block" data-page="women">WOMEN</a>
+            <a href="#" class="block" data-page="men">MEN</a>
+            <a href="#" class="block" data-page="wishlist">WISHLIST</a>
+            <a href="#" class="block" data-page="bag">BAG</a>
+        </nav>
+    </div>
+
+    <main class="mt-20">
+        <section id="home-button-container" class="container mx-auto py-8 px-4" style="display: none;">
+            <button onclick="renderPage('home')"
+                class="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m15 18-6-6 6-6" />
+                </svg>
+                <span class="font-medium">Back to Home</span>
+            </button>
+        </section>
+
+        <section id="explore-styles" class="container mx-auto py-12 px-4">
+            <h2 class="text-2xl md:text-4xl font-extrabold tracking-tight mb-8 text-center">EXPLORE THE LATEST STYLES
+            </h2>
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
+                <a class="category-card block rounded-lg overflow-hidden bg-white shadow-md grow-on-hover"
+                    onclick="showSection('CORD')">
+                    <div class="img-container">
+                        <img src="/public/Screenshot 2025-09-17 211508.png"
+                            alt="CORD SETS" class="w-full h-full object-cover" 
+                            >
+                    </div>
+                    <div class="p-6 text-center bg-gray-100">
+                        <h3 class="text-lg font-bold text-gray-800">CORD SETS</h3>
+                    </div>
+                </a>
+
+                <a class="category-card block rounded-lg overflow-hidden bg-white shadow-md grow-on-hover"
+                    onclick="showSection('POLOS')">
+                    <div class="img-container">
+                        <img src="https://images.unsplash.com/photo-1628045999086-a249c5e8880d?q=80&w=800&auto=format&fit=crop"
+                            alt="POLOS" class="w-full h-full object-cover" />
+                    </div>
+                    <div class="p-6 text-center bg-gray-100">
+                        <h3 class="text-lg font-bold text-gray-800">POLOS</h3>
+                    </div>
+                </a>
+
+                <a class="category-card block rounded-lg overflow-hidden bg-white shadow-md grow-on-hover"
+                    onclick="showSection('HOODIES')">
+                    <div class="img-container">
+                        <img src="https://images.unsplash.com/photo-1543888568-71e4d0b0b8c6?q=80&w=800&auto=format&fit=crop"
+                            alt="HOODIES" class="w-full h-full object-cover" />
+                    </div>
+                    <div class="p-6 text-center bg-gray-100">
+                        <h3 class="text-lg font-bold text-gray-800">HOODIES</h3>
+                    </div>
+                </a>
+
+                <a class="category-card block rounded-lg overflow-hidden bg-white shadow-md grow-on-hover"
+                    onclick="showSection('TRACK')">
+                    <div class="img-container">
+                        <img src="/public/Screenshot 2025-09-17 204445.png"
+                            alt="TRACK PANTS" class="w-full h-full object-cover" />
+                    </div>
+                    <div class="p-6 text-center bg-gray-100">
+                        <h3 class="text-lg font-bold text-gray-800">TRACK PANTS</h3>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+        <section id="video-section" class="container mx-auto py-12 px-4 flex items-center justify-center">
+            <div class="relative w-[90vw] max-w-[600px] aspect-[3/4] overflow-hidden rounded-lg shadow-xl">
+                <video id="promo-video" class="w-full h-full object-cover rounded-lg" loop muted playsinline>
+                    <source src="/public/WhatsApp Video 2025-09-15 at 13.34.38_87e3706b.mp4" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+            </div>
+        </section>
+
+        <section id="CORD" class="container mx-auto py-12 px-4">
+            <h2 class="text-2xl font-bold mb-6 text-center">Cord Set Collection</h2>
+            <div id="cord-grid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6"></div>
+        </section>
+
+        <section id="POLOS" class="container mx-auto py-12 px-4">
+            <h2 class="text-2xl font-bold mb-6 text-center">Polos Collection</h2>
+            <div id="polo-grid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6"></div>
+        </section>
+
+        <section id="HOODIES" class="container mx-auto py-12 px-4">
+            <h2 class="text-2xl font-bold mb-6 text-center">Hoodies Collection</h2>
+            <div id="hoodie-grid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6"></div>
+        </section>
+
+        <section id="RACING" class="container mx-auto py-12 px-4">
+            <h2 class="text-2xl font-bold mb-6 text-center">Racing Jackets Collection</h2>
+            <div id="racing-grid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6"></div>
+        </section>
+
+        <section id="TRACK" class="container mx-auto py-12 px-4">
+            <h2 class="text-2xl font-bold mb-6 text-center">Track Pants Collection</h2>
+            <div id="track-grid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6"></div>
+        </section>
+
+        <section id="JERSEYS" class="container mx-auto py-12 px-4">
+            <h2 class="text-2xl font-bold mb-6 text-center">Jerseys Collection</h2>
+            <div id="jersey-grid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6"></div>
+        </section>
+
+
+        <!-- ! ejs  -->
+<section class="pro">
+
+    <%
+        let categories = [...new Set(products.map(p => p.category || "Uncategorized"))];
+    %>
+
+    <div class="p-8">
+
+        <% categories.forEach(category => { %>
+
+            <h2 class="text-3xl font-bold text-gray-800 mb-6 border-b pb-2">
+                <%= category %>
+            </h2>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 mb-12">
+
+                <% products.forEach(p => { %>
+
+                    <% if ((p.category || "Uncategorized") === category) { %>
+
+                        <div 
+                            class="product-card group relative bg-white rounded-lg 
+                                   overflow-hidden transition-shadow duration-300 grow-on-hover"
+                            data-product-id="<%= p.id %>" 
+                            data-images='["<%= p.frontImg %>", "<%= p.backImg %>"]'>
+                            
+                            <div class="img-container relative w-full overflow-hidden" style="aspect-ratio: 1/1;">
+
+                                <!-- FRONT -->
+                                <img src="<%= p.frontImg %>"
+                                    alt="<%= p.name %> (Front)"
+                                    class="absolute inset-0 w-full h-full object-cover 
+                                           transition-opacity duration-300 
+                                           opacity-100 group-hover:opacity-0">
+
+                                <!-- BACK -->
+                                <img src="<%= p.backImg %>"
+                                    alt="<%= p.name %> (Back)"
+                                    class="absolute inset-0 w-full h-full object-cover 
+                                           transition-opacity duration-300 
+                                           opacity-0 group-hover:opacity-100">
+
+                                <button class="wishlist-btn absolute top-2 right-2 p-2 bg-white 
+                                           bg-opacity-70 rounded-full z-10 text-gray-500"
+                                        data-product-id="<%= p.id %>">❤️</button>
+
+                                <button class="view-btn absolute top-12 right-2 p-2 bg-white 
+                                           bg-opacity-70 rounded-full z-10 text-gray-500"
+                                        data-name="<%= p.name %>"
+                                        data-price="<%= p.price %>"
+                                        data-desc="<%= p.description || 'Description coming soon.' %>"
+                                        data-image="<%= p.frontImg %>"
+                                        data-back-image="<%= p.backImg %>">👁</button>
+
+                            </div>
+
+                            <div class="p-4 text-center">
+                                <h2 class="text-sm font-medium mb-1 truncate-ellipsis"><%= p.name %></h2>
+                                <p class="text-base font-semibold text-gray-700">₹<%= p.price %></p>
+                            </div>
+
+                            <div class="absolute inset-0 bg-black bg-opacity-30 flex items-center 
+                                        justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                <button class="add-to-bag-btn bg-white text-gray-900 font-bold 
+                                           py-2 px-6 rounded-full text-sm"
+                                        data-product-id="<%= p.id %>">ADD TO BAG</button>
+                            </div>
+
+                        </div>
+
+                    <% } %>
+
+                <% }) %>
+
+            </div>
+
+        <% }) %>
+
+    </div>
+
+</section>
+
+
+
+        <section id="WISHLIST" class="container mx-auto py-12 px-4" style="display:none">
+            <h2 class="text-2xl font-bold mb-6 text-center">My Wishlist</h2>
+            <div id="wishlist-grid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6"></div>
+        </section>
+
+        <section id="BAG" class="container mx-auto py-12 px-4" style="display:none">
+            <h2 class="text-2xl font-bold mb-6 text-center">Shopping Bag</h2>
+            <div id="bag-grid" class="grid grid-cols-1 gap-6"></div>
+        </section>
+
+    </main>
+<footer class="bg-black text-gray-300 py-12 mt-16">
+  <div class="container mx-auto px-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
+    <div>
+      <h4 class="font-bold text-white mb-4">CUSTOMER SERVICE</h4>
+      <ul class="space-y-2 text-sm">
+        <li><a href="#" class="hover:text-white transition-colors duration-300">Help</a></li>
+        <li><a href="#" class="hover:text-white transition-colors duration-300">Track Order</a></li>
+        <li><a href="#" class="hover:text-white transition-colors duration-300">Returns & Exchanges</a></li>
+      </ul>
+    </div>
+
+    <div>
+      <h4 class="font-bold text-white mb-4">ABOUT US</h4>
+      <ul class="space-y-2 text-sm">
+        <li><a href="#" class="hover:text-white transition-colors duration-300">Our Story</a></li>
+        <li><a href="#" class="hover:text-white transition-colors duration-300">Careers</a></li>
+      </ul>
+    </div>
+
+    <div>
+      <h4 class="font-bold text-white mb-4">MORE</h4>
+      <ul class="space-y-2 text-sm">
+        <li><a href="#" class="hover:text-white transition-colors duration-300">Mobile App</a></li>
+      </ul>
+    </div>
+
+    <div>
+      <h4 class="font-bold text-white mb-4">STAY CONNECTED</h4>
+      <div class="flex space-x-5">
+        <a href="https://www.instagram.com/themadeforhim/?hl=en" target="_blank" rel="noopener noreferrer"
+          class="hover:text-white transition-colors duration-300" aria-label="Instagram">
+          <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+            <path
+              d="M7.8 2h8.4C19.2 2 22 4.8 22 8.4v8.4c0 3.6-2.8 6.4-6.4 6.4H7.8C4.2 23.2 1.4 20.4 1.4 16.8V8.4C1.4 4.8 4.2 2 7.8 2zm0 1.4c-2.7 0-4.9 2.2-4.9 4.9v8.4c0 2.7 2.2 4.9 4.9 4.9h8.4c2.7 0 4.9-2.2 4.9-4.9V8.4c0-2.7-2.2-4.9-4.9-4.9H7.8zM12 7.8c-2.3 0-4.2 1.9-4.2 4.2s1.9 4.2 4.2 4.2 4.2-1.9 4.2-4.2-1.9-4.2-4.2-4.2zM18.8 6.2c0-.7-.6-1.3-1.3-1.3s-1.3.6-1.3 1.3.6 1.3 1.3 1.3 1.3-.6 1.3-1.3z" />
+          </svg>
+        </a>
+        <a href="https://wa.me/9172290884" target="_blank" rel="noopener noreferrer"
+          class="hover:text-white transition-colors duration-300" aria-label="WhatsApp">
+          <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+            <path
+              d="M12 .5C5.7.5.5 5.7.5 12c0 2.2.6 4.3 1.7 6.1L.6 23.4l5.5-1.4c1.7 1 3.7 1.5 5.9 1.5 6.3 0 11.5-5.2 11.5-11.5S18.3.5 12 .5zm0 20.9c-1.9 0-3.7-.5-5.2-1.5l-.4-.2-3.2.8.8-3.1-.2-.4c-1-1.6-1.5-3.4-1.5-5.2C2.3 7 6.7 2.6 12 2.6s9.7 4.4 9.7 9.7-4.4 9.1-9.7 9.1zm5.2-6.8c-.3-.2-1.7-.9-2-1-.3-.1-.5-.2-.7.2-.2.3-.8 1-.9 1.1-.2.2-.3.2-.6.1s-1.1-.4-2.1-1.3c-.8-.7-1.3-1.6-1.5-1.9-.2-.3 0-.5.1-.6.1-.1.3-.3.4-.5.1-.2.2-.3.3-.5.1-.2 0-.4 0-.6s-.7-1.7-1-2.3c-.3-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.7.3s-1 1-1 2.4 1 2.8 1.2 3c.1.2 2 3.1 5 4.3.7.3 1.2.5 1.6.6.7.2 1.4.2 1.9.1.6-.1 1.7-.7 1.9-1.3.2-.6.2-1.1.1-1.3-.2-.3-.3-.4-.6-.5z" />
+          </svg>
+        </a>
+        <a href="https://www.google.com/maps?q=18.5127907,73.8793638" target="_blank" rel="noopener noreferrer"
+          class="hover:text-white transition-colors duration-300" aria-label="Location">
+          <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+            <path
+              d="M12 2C8.1 2 5 5.1 5 9c0 5.2 7 13 7 13s7-7.8 7-13c0-3.9-3.1-7-7-7zm0 9.5c-1.4 0-2.5-1.1-2.5-2.5S10.6 6.5 12 6.5s2.5 1.1 2.5 2.5S13.4 11.5 12 11.5z" />
+          </svg>
+        </a>
+      </div>
+    </div>
+
+    <div>
+      <h4 class="font-bold text-white mb-4">SIGN UP FOR EMAIL</h4>
+      <form class="relative">
+        <input type="email" placeholder="Enter your email"
+          class="w-full px-4 py-3 border rounded-full text-gray-900" />
+        <button
+          class="absolute right-1 top-1/2 -translate-y-1/2 bg-white text-gray-900 px-4 py-2 rounded-full text-xs font-semibold">
+          SIGN UP
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <div class="mt-12 text-center text-sm text-gray-400">
+    ✅ 100% Authentic Fragrances | 🚚 COD Available | 📍 Pune Store
+  </div>
+
+  <div class="mt-4 pt-6 border-t border-gray-700 text-center text-xs text-gray-500">
+    Copyright © 2025 MADE FOR HIM. All rights reserved.
+  </div>
+</footer>
+
+    <!-- Product Modal -->
+    <div id="product-modal" class="modal fixed inset-0 z-50 flex items-center justify-center opacity-0 invisible">
+        <div class="fixed inset-0 bg-black bg-opacity-50"></div>
+        <div class="modal-content bg-white rounded-lg max-w-2xl w-full mx-4 relative z-10">
+            <button id="close-modal-btn" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="M18 6L6 18M6 6l12 12" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </button>
+            <div class="p-6">
+                <div class="flex flex-col md:flex-row gap-8">
+                    <div class="w-full md:w-1/2">
+                        <img id="modal-product-image" src="" alt="" class="w-full h-auto rounded-lg">
+                    </div>
+                    <div class="w-full md:w-1/2">
+                        <h2 id="modal-product-name" class="text-2xl font-bold mb-2"></h2>
+                        <p id="modal-product-price" class="text-xl font-semibold mb-4"></p>
+                        <p id="modal-product-description" class="text-gray-600 mb-6"></p>
+                        
+                        <div class="mb-6">
+                            <h3 class="font-semibold mb-2">Select Size</h3>
+                            <div id="size-options" class="flex gap-2">
+                                <button class="size-btn px-4 py-2 border rounded-md hover:border-gray-900" data-size="S">S</button>
+                                <button class="size-btn px-4 py-2 border rounded-md hover:border-gray-900" data-size="M">M</button>
+                                <button class="size-btn px-4 py-2 border rounded-md hover:border-gray-900" data-size="L">L</button>
+                                <button class="size-btn px-4 py-2 border rounded-md hover:border-gray-900" data-size="XL">XL</button>
+                                <button class="size-btn px-4 py-2 border rounded-md hover:border-gray-900" data-size="XXL">XXL</button>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-6">
+                            <h3 class="font-semibold mb-2">Quantity</h3>
+                            <div class="flex items-center gap-2">
+                                <button id="decrement-qty" class="px-3 py-1 border rounded-md">-</button>
+                                <input id="product-qty" type="number" value="1" min="1" class="w-16 text-center border rounded-md">
+                                <button id="increment-qty" class="px-3 py-1 border rounded-md">+</button>
+                            </div>
+                        </div>
+                        
+                        <div class="flex gap-4">
+                            <button id="modal-order-btn" class="flex-1 bg-green-500 text-white py-3 rounded-md hover:bg-green-600">
+                                ORDER ON WHATSAPP
+                            </button>
+                            <button id="modal-add-to-bag-btn" class="flex-1 bg-gray-900 text-white py-3 rounded-md hover:bg-gray-800">
+                                ADD TO BAG
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/main.js"></script>
+   
+</body>
+
+</html>

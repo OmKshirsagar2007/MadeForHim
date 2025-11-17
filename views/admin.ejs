@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ADMIN • MADE FOR HIM</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-black text-white font-[Inter]">
+
+  <div class="max-w-3xl mx-auto mt-10 bg-[#111] rounded-xl p-6 shadow-xl border border-gray-700">
+
+    <h1 class="text-center text-3xl font-bold text-yellow-400 mb-8">
+      ADMIN PANEL — MADE FOR HIM
+    </h1>
+
+    <!-- Tabs -->
+    <div class="flex gap-4 mb-6">
+      <button id="uploadTab" class="px-4 py-2 rounded-lg bg-yellow-400 text-black font-bold">
+        Upload Product
+      </button>
+
+      <button id="deleteTab" class="px-4 py-2 rounded-lg bg-gray-700 hover:bg-gray-600 transition">
+        Delete Product
+      </button>
+    </div>
+
+    <!-- UPLOAD PRODUCT PAGE -->
+    <div id="uploadPage">
+
+      <label class="block mb-2 font-semibold">Product Name</label>
+      <input id="name" class="w-full p-3 rounded bg-gray-900 border border-gray-600 mb-4" type="text">
+
+      <label class="block mb-2 font-semibold">Price (₹)</label>
+      <input id="price" class="w-full p-3 rounded bg-gray-900 border border-gray-600 mb-4" type="number">
+
+      <label class="block mb-2 font-semibold">Category</label>
+      <select id="category" class="w-full p-3 rounded bg-gray-900 border border-gray-600 mb-4">
+        <option disabled selected>Choose Category</option>
+        <option value="CORD">CORD</option>
+        <option value="POLOS">POLOS</option>
+        <option value="HOODIES">HOODIES</option>
+        <option value="TRACK">TRACK</option>
+        <option value="JERSEYS">JERSEYS</option>
+      </select>
+
+      <label class="block mb-2 font-semibold">Front Image</label>
+      <input id="frontImg" type="file" accept="image/*" class="w-full mb-4">
+      <img id="frontPrev" class="hidden w-40 mx-auto mt-2 rounded">
+
+      <label class="block mb-2 font-semibold">Back Image</label>
+      <input id="backImg" type="file" accept="image/*" class="w-full mb-4">
+      <img id="backPrev" class="hidden w-40 mx-auto mt-2 rounded">
+
+      <label class="block mb-2 font-semibold">Description</label>
+      <textarea id="description" rows="3"
+        class="w-full p-3 rounded bg-gray-900 border border-gray-600"></textarea>
+
+      <button id="saveBtn"
+        class="mt-6 w-full bg-yellow-400 text-black font-bold py-3 rounded-lg hover:bg-yellow-500 transition">
+        SAVE PRODUCT
+      </button>
+
+      <!-- Success animation -->
+      <div id="successAnim"
+        class="hidden text-center text-green-400 text-xl font-bold mt-4 animate-pulse">
+        ✔ Product Uploaded Successfully!
+      </div>
+
+    </div>
+
+    <!-- DELETE PAGE -->
+    <div id="deletePage" class="hidden">
+      <h2 class="text-xl font-bold text-red-400 mb-4">DELETE PRODUCT</h2>
+
+      <div id="deleteList" class="grid gap-4"></div>
+    </div>
+
+  </div>
+
+  <script>
+    let frontImg = document.getElementById("frontImg");
+    let backImg = document.getElementById("backImg");
+    let frontPrev = document.getElementById("frontPrev");
+    let backPrev = document.getElementById("backPrev");
+
+    frontImg.onchange = () => {
+      let f = frontImg.files[0];
+      if (f) {
+        frontPrev.src = URL.createObjectURL(f);
+        frontPrev.classList.remove("hidden");
+      }
+    };
+
+    backImg.onchange = () => {
+      let f = backImg.files[0];
+      if (f) {
+        backPrev.src = URL.createObjectURL(f);
+        backPrev.classList.remove("hidden");
+      }
+    };
+
+    let uploadTab = document.getElementById("uploadTab");
+    let deleteTab = document.getElementById("deleteTab");
+    let uploadPage = document.getElementById("uploadPage");
+    let deletePage = document.getElementById("deletePage");
+
+    uploadTab.onclick = () => {
+      uploadPage.classList.remove("hidden");
+      deletePage.classList.add("hidden");
+      uploadTab.classList.add("bg-yellow-400", "text-black");
+      deleteTab.classList.remove("bg-yellow-400");
+    };
+
+    deleteTab.onclick = () => {
+      uploadPage.classList.add("hidden");
+      deletePage.classList.remove("hidden");
+      deleteTab.classList.add("bg-yellow-400", "text-black");
+      uploadTab.classList.remove("bg-yellow-400");
+
+      loadDeleteProducts();
+    };
+
+    let successAnim = document.getElementById("successAnim");
+
+    let resetFields = () => {
+      document.getElementById("name").value = "";
+      document.getElementById("price").value = "";
+      document.getElementById("category").selectedIndex = 0;
+      document.getElementById("description").value = "";
+      frontImg.value = "";
+      backImg.value = "";
+      frontPrev.src = "";
+      backPrev.src = "";
+      frontPrev.classList.add("hidden");
+      backPrev.classList.add("hidden");
+    };
+
+    let saveBtn = document.getElementById("saveBtn");
+
+    saveBtn.onclick = async () => {
+      let fd = new FormData();
+      fd.append("name", document.getElementById("name").value);
+      fd.append("price", document.getElementById("price").value);
+      fd.append("category", document.getElementById("category").value);
+      fd.append("description", document.getElementById("description").value);
+      fd.append("frontImg", frontImg.files[0]);
+      fd.append("backImg", backImg.files[0]);
+
+      let res = await fetch("/upload-product", { method: "POST", body: fd });
+      let data = await res.json();
+
+      if (data.message) {
+        successAnim.classList.remove("hidden");
+
+        setTimeout(() => {
+          successAnim.classList.add("hidden");
+        }, 2000);
+
+        resetFields();
+      }
+    };
+
+    let deleteList = document.getElementById("deleteList");
+
+    let loadDeleteProducts = async () => {
+      let res = await fetch("/all-products");
+      let data = await res.json();
+
+      deleteList.innerHTML = "";
+
+      data.products.forEach(p => {
+        let box = document.createElement("div");
+        box.className = "flex items-center gap-4 bg-gray-900 p-4 rounded border border-gray-700";
+
+        box.innerHTML = `
+          <img src="${p.frontImg}" class="w-20 h-20 rounded object-cover">
+          <div class="flex-1">
+            <p class="font-bold text-yellow-300">${p.name}</p>
+            <p class="text-gray-300 text-sm">₹${p.price} • ${p.category}</p>
+          </div>
+          <button data-id="${p._id}"
+            class="deleteBtn bg-red-500 hover:bg-red-600 px-4 py-2 rounded font-bold">
+            DELETE
+          </button>
+        `;
+
+        deleteList.appendChild(box);
+      });
+
+      let allBtns = document.querySelectorAll(".deleteBtn");
+
+      allBtns.forEach(btn => {
+        btn.onclick = async () => {
+          let id = btn.getAttribute("data-id");
+
+          let res = await fetch(`/delete-product/${id}`, { method: "DELETE" });
+          let d = await res.json();
+
+          alert(d.message);
+          loadDeleteProducts();
+        };
+      });
+    };
+  </script>
+
+</body>
+
+</html>
