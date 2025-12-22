@@ -27,7 +27,7 @@
       </button>
     </div>
 
-    <!-- UPLOAD PRODUCT PAGE -->
+    <!-- UPLOAD PAGE -->
     <div id="uploadPage">
 
       <label class="block mb-2 font-semibold">Product Name</label>
@@ -63,9 +63,9 @@
         SAVE PRODUCT
       </button>
 
-      <!-- Success animation -->
+      <!-- SUCCESS ANIMATION -->
       <div id="successAnim"
-        class="hidden text-center text-green-400 text-xl font-bold mt-4 animate-pulse">
+        class="hidden text-center text-green-400 text-xl font-bold mt-4 transition-opacity duration-500">
         ✔ Product Uploaded Successfully!
       </div>
 
@@ -74,7 +74,6 @@
     <!-- DELETE PAGE -->
     <div id="deletePage" class="hidden">
       <h2 class="text-xl font-bold text-red-400 mb-4">DELETE PRODUCT</h2>
-
       <div id="deleteList" class="grid gap-4"></div>
     </div>
 
@@ -110,20 +109,17 @@
     uploadTab.onclick = () => {
       uploadPage.classList.remove("hidden");
       deletePage.classList.add("hidden");
-      uploadTab.classList.add("bg-yellow-400", "text-black");
-      deleteTab.classList.remove("bg-yellow-400");
     };
 
     deleteTab.onclick = () => {
       uploadPage.classList.add("hidden");
       deletePage.classList.remove("hidden");
-      deleteTab.classList.add("bg-yellow-400", "text-black");
-      uploadTab.classList.remove("bg-yellow-400");
-
       loadDeleteProducts();
     };
 
     let successAnim = document.getElementById("successAnim");
+    let saveBtn = document.getElementById("saveBtn");
+    let isUploading = false;
 
     let resetFields = () => {
       document.getElementById("name").value = "";
@@ -132,15 +128,18 @@
       document.getElementById("description").value = "";
       frontImg.value = "";
       backImg.value = "";
-      frontPrev.src = "";
-      backPrev.src = "";
       frontPrev.classList.add("hidden");
       backPrev.classList.add("hidden");
     };
 
-    let saveBtn = document.getElementById("saveBtn");
-
     saveBtn.onclick = async () => {
+      if (isUploading) return;
+      isUploading = true;
+
+      saveBtn.disabled = true;
+      saveBtn.innerText = "UPLOADING...";
+      saveBtn.classList.add("opacity-50", "cursor-not-allowed");
+
       let fd = new FormData();
       fd.append("name", document.getElementById("name").value);
       fd.append("price", document.getElementById("price").value);
@@ -149,18 +148,29 @@
       fd.append("frontImg", frontImg.files[0]);
       fd.append("backImg", backImg.files[0]);
 
-      let res = await fetch("/upload-product", { method: "POST", body: fd });
-      let data = await res.json();
+      try {
+        let res = await fetch("/upload-product", { method: "POST", body: fd });
+        let data = await res.json();
 
-      if (data.message) {
-        successAnim.classList.remove("hidden");
-
-        setTimeout(() => {
+        if (data.message) {
           successAnim.classList.add("hidden");
-        }, 2000);
+          void successAnim.offsetWidth;
+          successAnim.classList.remove("hidden");
 
-        resetFields();
+          setTimeout(() => {
+            successAnim.classList.add("hidden");
+          }, 2000);
+
+          resetFields();
+        }
+      } catch {
+        alert("Upload failed");
       }
+
+      saveBtn.disabled = false;
+      saveBtn.innerText = "SAVE PRODUCT";
+      saveBtn.classList.remove("opacity-50", "cursor-not-allowed");
+      isUploading = false;
     };
 
     let deleteList = document.getElementById("deleteList");
@@ -190,15 +200,11 @@
         deleteList.appendChild(box);
       });
 
-      let allBtns = document.querySelectorAll(".deleteBtn");
-
-      allBtns.forEach(btn => {
+      document.querySelectorAll(".deleteBtn").forEach(btn => {
         btn.onclick = async () => {
           let id = btn.getAttribute("data-id");
-
           let res = await fetch(`/delete-product/${id}`, { method: "DELETE" });
           let d = await res.json();
-
           alert(d.message);
           loadDeleteProducts();
         };
@@ -207,5 +213,4 @@
   </script>
 
 </body>
-
 </html>
